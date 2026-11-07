@@ -9,6 +9,10 @@ This fork includes a default build for the Jaycar Duinotech XC3800 ESP32 board,
 alongside the original M5Atom build. See [the Linux build guide](docs/building.md)
 for installation, building, USB flashing, and serial configuration.
 
+For the XC3800 / MCP2021 build, see [the hardware guide](docs/hardware.md) for
+the parts list, wiring tables, circuit schematic, and breadboard layout.
+The original M5Atom instructions below describe the upstream hardware.
+
 Quick start
 -----------
 
@@ -55,6 +59,13 @@ Alternatively, you can use an online QR code generator such as [the-qrcode-gener
 
 Example Circuit
 ---------------
+
+XC3800 / MCP2021 build (see [the hardware guide](docs/hardware.md) for details):
+
+![XC3800 / MCP2021 circuit](docs/hardware/xc3800-schematic.svg)
+
+Original M5Atom / MCP2025 reference:
+
 <img src="https://github.com/unreality/FujiHK/blob/master/example-circuit.png"/>
 
 Other ESP Boards
