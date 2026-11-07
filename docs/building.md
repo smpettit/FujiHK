@@ -1,5 +1,7 @@
 # Building FujiHK on Linux
 
+For the XC3800 circuit, parts, and wiring, see [the hardware guide](hardware.md).
+
 ## Supported build environments
 
 | Environment | Board | Setup button | Status pixel |

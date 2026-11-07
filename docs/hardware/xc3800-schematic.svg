@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="1050" viewBox="0 0 1320 1050">
+<title>XC3800 + MCP2021: reported working build: schematic</title>
+<style>text{font-family:DejaVu Sans,sans-serif;fill:#172b4d} .small{font-size:14px} .label{font-size:17px} .heading{font-size:24px;font-weight:bold}</style>
+<rect width="1320" height="1050" fill="#fff"/>
+<text x="35" y="42" class="heading" text-anchor="start">XC3800 + MCP2021: reported working build</text>
+<text x="35" y="73" class="small" text-anchor="start">Net-labelled schematic: every repeated net name is electrically connected.</text>
+<text x="35" y="97" class="small" text-anchor="start">As built; not independently measured or electrically certified</text>
+<rect x="135" y="140" width="295" height="205" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="282.5" y="167" class="label" text-anchor="middle">U2</text>
+<text x="282.5" y="189" class="small" text-anchor="middle">R-78E3.3-0.5</text>
+<line x1="430" y1="215" x2="530" y2="215" stroke="#b04416" stroke-width="3"/>
+<text x="420" y="208" class="small" text-anchor="end">1 Vin</text>
+<text x="530" y="207" class="small" text-anchor="end">+12V</text>
+<line x1="430" y1="265" x2="530" y2="265" stroke="#475569" stroke-width="3"/>
+<text x="420" y="258" class="small" text-anchor="end">2 GND</text>
+<text x="530" y="257" class="small" text-anchor="end">GND</text>
+<line x1="430" y1="315" x2="530" y2="315" stroke="#087f5b" stroke-width="3"/>
+<text x="420" y="308" class="small" text-anchor="end">3 Vout</text>
+<text x="530" y="307" class="small" text-anchor="end">+3V3</text>
+<rect x="855" y="140" width="315" height="205" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="1012.5" y="167" class="label" text-anchor="middle">J1</text>
+<text x="1012.5" y="189" class="small" text-anchor="middle">Heat-pump connection</text>
+<line x1="855" y1="215" x2="755" y2="215" stroke="#b04416" stroke-width="3"/>
+<text x="865" y="208" class="small" text-anchor="start">+12V</text>
+<text x="755" y="207" class="small" text-anchor="start">+12V</text>
+<line x1="855" y1="265" x2="755" y2="265" stroke="#7c3aed" stroke-width="3"/>
+<text x="865" y="258" class="small" text-anchor="start">LIN</text>
+<text x="755" y="257" class="small" text-anchor="start">LIN</text>
+<line x1="855" y1="315" x2="755" y2="315" stroke="#475569" stroke-width="3"/>
+<text x="865" y="308" class="small" text-anchor="start">GND</text>
+<text x="755" y="307" class="small" text-anchor="start">GND</text>
+<rect x="175" y="400" width="395" height="290" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="372.5" y="427" class="label" text-anchor="middle">U1</text>
+<text x="372.5" y="449" class="small" text-anchor="middle">MCP2021-330E/P</text>
+<line x1="175" y1="485" x2="75" y2="485" stroke="#006eaa" stroke-width="3"/>
+<text x="185" y="478" class="small" text-anchor="start">1 RXD</text>
+<text x="75" y="477" class="small" text-anchor="start">LIN_RX</text>
+<line x1="175" y1="540" x2="75" y2="540" stroke="#087f5b" stroke-width="3"/>
+<text x="185" y="533" class="small" text-anchor="start">2 CS/LWAKE</text>
+<text x="75" y="532" class="small" text-anchor="start">ENABLE</text>
+<line x1="175" y1="595" x2="75" y2="595" stroke="#946300" stroke-width="3"/>
+<text x="185" y="588" class="small" text-anchor="start">3 VREG</text>
+<text x="75" y="587" class="small" text-anchor="start">VREG</text>
+<line x1="175" y1="650" x2="75" y2="650" stroke="#b42367" stroke-width="3"/>
+<text x="185" y="643" class="small" text-anchor="start">4 TXD</text>
+<text x="75" y="642" class="small" text-anchor="start">LIN_TX</text>
+<line x1="570" y1="485" x2="670" y2="485" stroke="#087f5b" stroke-width="3"/>
+<text x="560" y="478" class="small" text-anchor="end">8 FAULT/TXE</text>
+<text x="670" y="477" class="small" text-anchor="end">FAULT_TXE</text>
+<line x1="570" y1="540" x2="670" y2="540" stroke="#b04416" stroke-width="3"/>
+<text x="560" y="533" class="small" text-anchor="end">7 VBB</text>
+<text x="670" y="532" class="small" text-anchor="end">+12V</text>
+<line x1="570" y1="595" x2="670" y2="595" stroke="#7c3aed" stroke-width="3"/>
+<text x="560" y="588" class="small" text-anchor="end">6 LBUS</text>
+<text x="670" y="587" class="small" text-anchor="end">LIN</text>
+<line x1="570" y1="650" x2="670" y2="650" stroke="#475569" stroke-width="3"/>
+<text x="560" y="643" class="small" text-anchor="end">5 VSS</text>
+<text x="670" y="642" class="small" text-anchor="end">GND</text>
+<rect x="855" y="400" width="410" height="290" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="1060.0" y="427" class="label" text-anchor="middle">A1</text>
+<text x="1060.0" y="449" class="small" text-anchor="middle">XC3800 ESP32 (connected pins only)</text>
+<line x1="855" y1="485" x2="755" y2="485" stroke="#087f5b" stroke-width="3"/>
+<text x="865" y="478" class="small" text-anchor="start">3V3</text>
+<text x="755" y="477" class="small" text-anchor="start">+3V3</text>
+<line x1="855" y1="540" x2="755" y2="540" stroke="#475569" stroke-width="3"/>
+<text x="865" y="533" class="small" text-anchor="start">GND</text>
+<text x="755" y="532" class="small" text-anchor="start">GND</text>
+<line x1="855" y1="595" x2="755" y2="595" stroke="#b42367" stroke-width="3"/>
+<text x="865" y="588" class="small" text-anchor="start">GPIO22 / TX</text>
+<text x="755" y="587" class="small" text-anchor="start">LIN_TX</text>
+<line x1="855" y1="650" x2="755" y2="650" stroke="#006eaa" stroke-width="3"/>
+<text x="865" y="643" class="small" text-anchor="start">GPIO19 / RX</text>
+<text x="755" y="642" class="small" text-anchor="start">LIN_RX</text>
+<text x="175" y="719" class="small" text-anchor="start">U1 pin numbers: DIP-8 top view; use the -330 (3.3 V) variant.</text>
+<text x="180" y="775" class="label" text-anchor="middle">+3V3</text>
+<line x1="180" y1="788" x2="180" y2="815" stroke="#087f5b" stroke-width="3"/>
+<rect x="168" y="815" width="24" height="65" rx="5" fill="#fff" stroke="#64748b" stroke-width="2"/>
+<line x1="180" y1="880" x2="180" y2="906" stroke="#087f5b" stroke-width="3"/>
+<text x="180" y="929" class="label" text-anchor="middle">ENABLE</text>
+<text x="217" y="828" class="small" text-anchor="start">R1</text>
+<text x="180" y="962" class="small" text-anchor="middle">10k / 0.5W</text>
+<text x="490" y="775" class="label" text-anchor="middle">+3V3</text>
+<line x1="490" y1="788" x2="490" y2="815" stroke="#087f5b" stroke-width="3"/>
+<rect x="478" y="815" width="24" height="65" rx="5" fill="#fff" stroke="#64748b" stroke-width="2"/>
+<line x1="490" y1="880" x2="490" y2="906" stroke="#087f5b" stroke-width="3"/>
+<text x="490" y="929" class="label" text-anchor="middle">FAULT_TXE</text>
+<text x="527" y="828" class="small" text-anchor="start">R2</text>
+<text x="490" y="962" class="small" text-anchor="middle">10k / 0.5W</text>
+<text x="800" y="775" class="label" text-anchor="middle">+12V</text>
+<line x1="800" y1="788" x2="800" y2="815" stroke="#b04416" stroke-width="3"/>
+<line x1="775" y1="838" x2="825" y2="838" stroke="#475569" stroke-width="3"/>
+<line x1="775" y1="854" x2="825" y2="854" stroke="#475569" stroke-width="3"/>
+<line x1="800" y1="815" x2="800" y2="838" stroke="#b04416" stroke-width="3"/>
+<line x1="800" y1="854" x2="800" y2="880" stroke="#475569" stroke-width="3"/>
+<text x="754" y="832" class="label" text-anchor="start">+</text>
+<line x1="800" y1="880" x2="800" y2="906" stroke="#475569" stroke-width="3"/>
+<text x="800" y="929" class="label" text-anchor="middle">GND</text>
+<text x="837" y="828" class="small" text-anchor="start">C1</text>
+<text x="800" y="962" class="small" text-anchor="middle">10uF / 63V electrolytic</text>
+<text x="1110" y="775" class="label" text-anchor="middle">VREG</text>
+<line x1="1110" y1="788" x2="1110" y2="815" stroke="#946300" stroke-width="3"/>
+<line x1="1085" y1="838" x2="1135" y2="838" stroke="#475569" stroke-width="3"/>
+<line x1="1085" y1="854" x2="1135" y2="854" stroke="#475569" stroke-width="3"/>
+<line x1="1110" y1="815" x2="1110" y2="838" stroke="#946300" stroke-width="3"/>
+<line x1="1110" y1="854" x2="1110" y2="880" stroke="#475569" stroke-width="3"/>
+<text x="1064" y="832" class="label" text-anchor="start">+</text>
+<line x1="1110" y1="880" x2="1110" y2="906" stroke="#475569" stroke-width="3"/>
+<text x="1110" y="929" class="label" text-anchor="middle">GND</text>
+<text x="1147" y="828" class="small" text-anchor="start">C2</text>
+<text x="1110" y="962" class="small" text-anchor="middle">10uF / 25V electrolytic</text>
+<text x="35" y="1004" class="small" text-anchor="start">VREG connects only to C2. Do not join VREG and +3V3. C1 fitted; no reverse-polarity diode fitted.</text>
+<text x="35" y="1028" class="small" text-anchor="start">See hardware.md for capacitor ESR, supply sequencing, and power-rail verification limits.</text>
+</svg>

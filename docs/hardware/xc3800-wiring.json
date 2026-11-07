@@ -1,0 +1,242 @@
+{
+  "title": "XC3800 + MCP2021: reported working build",
+  "status": "As built; not independently measured or electrically certified",
+  "rail_assumption": "All + rail holes are continuous; all - rail holes are continuous. Check the physical breadboard for rail breaks.",
+  "nets": {
+    "+12V": "#b04416",
+    "GND": "#475569",
+    "+3V3": "#087f5b",
+    "LIN": "#7c3aed",
+    "LIN_RX": "#006eaa",
+    "LIN_TX": "#b42367",
+    "ENABLE": "#087f5b",
+    "FAULT_TXE": "#087f5b",
+    "VREG": "#946300"
+  },
+  "components": [
+    {
+      "id": "J1",
+      "name": "Heat-pump connection",
+      "pins": [
+        [
+          "+12V",
+          "+12V",
+          "+1"
+        ],
+        [
+          "LIN",
+          "LIN",
+          "h12"
+        ],
+        [
+          "GND",
+          "GND",
+          "-1"
+        ]
+      ]
+    },
+    {
+      "id": "U1",
+      "name": "MCP2021-330E/P",
+      "pins": [
+        [
+          "1 RXD",
+          "LIN_RX",
+          "e10"
+        ],
+        [
+          "2 CS/LWAKE",
+          "ENABLE",
+          "e11"
+        ],
+        [
+          "3 VREG",
+          "VREG",
+          "e12"
+        ],
+        [
+          "4 TXD",
+          "LIN_TX",
+          "e13"
+        ],
+        [
+          "5 VSS",
+          "GND",
+          "f13"
+        ],
+        [
+          "6 LBUS",
+          "LIN",
+          "f12"
+        ],
+        [
+          "7 VBB",
+          "+12V",
+          "f11"
+        ],
+        [
+          "8 FAULT/TXE",
+          "FAULT_TXE",
+          "f10"
+        ]
+      ]
+    },
+    {
+      "id": "U2",
+      "name": "R-78E3.3-0.5",
+      "pins": [
+        [
+          "1 Vin",
+          "+12V",
+          "a5"
+        ],
+        [
+          "2 GND",
+          "GND",
+          "a4"
+        ],
+        [
+          "3 Vout",
+          "+3V3",
+          "a3"
+        ]
+      ]
+    },
+    {
+      "id": "A1",
+      "name": "XC3800 ESP32 (connected pins only)",
+      "pins": [
+        [
+          "3V3",
+          "+3V3",
+          "b40"
+        ],
+        [
+          "GND",
+          "GND",
+          "i40"
+        ],
+        [
+          "GPIO22 / TX",
+          "LIN_TX",
+          "i42"
+        ],
+        [
+          "GPIO19 / RX",
+          "LIN_RX",
+          "i47"
+        ]
+      ],
+      "placement": {
+        "first_hole": "b40",
+        "last_hole": "i58"
+      }
+    },
+    {
+      "id": "R1",
+      "name": "10k / 0.5W",
+      "pins": [
+        [
+          "1",
+          "+3V3",
+          "b3"
+        ],
+        [
+          "2",
+          "ENABLE",
+          "b11"
+        ]
+      ]
+    },
+    {
+      "id": "R2",
+      "name": "10k / 0.5W",
+      "pins": [
+        [
+          "1",
+          "+3V3",
+          "h3"
+        ],
+        [
+          "2",
+          "FAULT_TXE",
+          "h10"
+        ]
+      ]
+    },
+    {
+      "id": "C1",
+      "name": "10uF / 63V electrolytic",
+      "pins": [
+        [
+          "+",
+          "+12V",
+          "+6"
+        ],
+        [
+          "-",
+          "GND",
+          "-6"
+        ]
+      ]
+    },
+    {
+      "id": "C2",
+      "name": "10uF / 25V electrolytic",
+      "pins": [
+        [
+          "+",
+          "VREG",
+          "a12"
+        ],
+        [
+          "-",
+          "GND",
+          "a15"
+        ]
+      ]
+    }
+  ],
+  "jumpers": [
+    [
+      "e5",
+      "+5"
+    ],
+    [
+      "e4",
+      "-4"
+    ],
+    [
+      "e3",
+      "f3"
+    ],
+    [
+      "j11",
+      "+11"
+    ],
+    [
+      "j13",
+      "-13"
+    ],
+    [
+      "e15",
+      "-15"
+    ],
+    [
+      "d3",
+      "a40"
+    ],
+    [
+      "a10",
+      "j47"
+    ],
+    [
+      "c13",
+      "j42"
+    ],
+    [
+      "j40",
+      "-40"
+    ]
+  ]
+}
