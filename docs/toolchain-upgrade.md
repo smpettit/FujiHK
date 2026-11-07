@@ -93,16 +93,52 @@ Before the first hardware upgrade:
 5. Disconnect USB before restoring the heat-pump connections. Check secondary
    binding, thermostat updates, and synchronisation with the wall controller.
 
-The backup, upload, and runtime checks above have **not** been performed for
-this upgrade. The connected ESP32 was not opened, reset, or flashed during
-this build investigation.
+## Hardware validation
 
-## Wi-Fi follow-up
+On 2026-11-07, the merged upgrade was uploaded to the owner's XC3800 over USB
+using the PlatformIO `esp32dev` upload target. All three heat-pump connections
+(+12 V, ground, and controller bus) were disconnected. No whole-flash erase
+was performed, and no full-flash backup was taken for this run.
 
-The new framework's ESP32 SDK configuration enables WPA3-SAE. That establishes
-build support, not successful interoperability with the owner's Aruba Instant
-On access point. Test mixed WPA2/WPA3 authentication and reconnect behaviour
-separately; do not infer a Wi-Fi fix from compilation.
+Observed results:
+
+- esptool verified the bootloader, partition table, OTA boot metadata, and
+  application writes. The reported chip was ESP32-D0WD-V3 revision 3.1.
+- HomeSpan 2.1.8 / ESP-IDF 5.5.5 booted from `app0`. The accessory database
+  validated with zero errors and zero warnings.
+- Saved Wi-Fi credentials and both saved HomeKit controller records survived.
+  An authenticated HomeKit client connection was observed after the upgrade.
+- The initial WPA2 connection succeeded. After the owner enabled WPA2/WPA3
+  mixed mode on Aruba Instant On, Wi-Fi recovered from an access-point
+  interruption without rewriting credentials.
+- With mixed mode confirmed enabled, the ESP32 connected after a requested
+  hardware reset. HomeSpan's `D` command then forced a Wi-Fi disconnect;
+  a fresh connection was observed about 3.5 seconds later. An authenticated
+  HomeKit client was present in the subsequent `s` status response.
+- Once connected, HomeSpan's `Z` scan showed WPA2+WPA3 security advertised by
+  the connected access point, matched using its BSSID. A scan attempted during
+  startup returned no network rows, so the successful scan was run after startup.
+- No crash, brownout, assertion, or panic markers appeared in the bounded
+  serial captures. This is not a long-duration stability test.
+
+The mixed-mode connectivity checks pass with the upgraded dependencies; no
+additional Wi-Fi configuration or application-source patch was required.
+The credentials were not re-entered: reset and explicit disconnect/reconnect
+exercised new connections using the retained settings.
+
+The new framework's ESP32 SDK configuration enables WPA3-SAE, but these checks
+do not determine whether the mixed-mode connection negotiated WPA2 or WPA3.
+WPA3-only authentication has not been tested.
+
+Serial logs and network identifiers are excluded from this repository. Tests
+were limited to USB startup, Wi-Fi, and HomeKit transport. Controller-bus
+communication, secondary binding, wall-controller synchronisation, and actual
+heat-pump operation remain untested on the upgraded firmware. These results
+also do not validate the circuit's power sequencing or capacitor ESR.
+
+Opening the CP2102 serial adapter caused a board reset during these checks,
+even when DTR/RTS were initially disabled. Allow startup to complete before
+issuing CLI commands and keep the serial port open during a test sequence.
 
 ## Upstream references
 

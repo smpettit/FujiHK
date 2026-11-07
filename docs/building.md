@@ -15,9 +15,11 @@ controller. The XC3800's EN button resets the board; BOOT is its setup button.
 
 The current build uses PlatformIO Espressif32 **8.0.0** (Arduino-ESP32
 **3.3.12**, ESP-IDF **5.5.5**) and HomeSpan **2.1.8**, with the framework's
-`min_spiffs.csv` partition layout. Both boards compile with these versions;
-hardware validation is pending. See [the upgrade findings](toolchain-upgrade.md)
-for the reproduced failures, partition changes, and checks before flashing.
+`min_spiffs.csv` partition layout. Both boards compile with these versions.
+The XC3800 has also passed USB startup, saved-settings, and mixed-mode Wi-Fi
+checks with the heat-pump leads disconnected. Heat-pump control and M5Atom
+runtime checks remain pending. See [the upgrade findings](toolchain-upgrade.md)
+for the reproduced failures, partition changes, and hardware results.
 
 The owner's working hardware baseline used Espressif32 **6.13.0**, Arduino-ESP32
 **2.0.17**, and HomeSpan **release-1.9.1**. The current platform and HomeSpan
@@ -98,10 +100,13 @@ Follow the serial prompts and keep credentials out of Git and shared logs. The
 XC3800 has no status pixel, so use serial output for setup feedback. GPIO0 is
 also a boot-strapping pin: holding BOOT during reset enters the ESP32 downloader.
 
-The existing installation has been reported working with WPA2-Personal, but
-fails to connect to its Aruba Instant On WPA2/WPA3 mixed network. Mixed-mode
-and WPA3 operation remain unverified for the upgraded firmware. A successful
-build does not establish that the Wi-Fi interoperability issue is fixed.
+The older firmware failed to connect when WPA2/WPA3 mixed mode was enabled on
+the owner's Aruba Instant On network. With the upgraded stack, the XC3800
+connected after a hardware reset and after a forced Wi-Fi disconnect with
+mixed mode enabled. Existing credentials and HomeKit pairing were retained.
+See [the hardware validation results](toolchain-upgrade.md#hardware-validation)
+for the observations and limits. WPA3-only operation and the protocol actually
+negotiated on the mixed network have not been verified.
 
 ## Validation limits
 
@@ -120,4 +125,4 @@ older default partition layout does not fit it.
 A successful build verifies compilation and image size. It does not verify
 physical wiring, Wi-Fi authentication, HomeKit operation, or communication with
 the heat pump. Recheck those on hardware after flashing. This change preserves
-the existing thermostat and fan source code; runtime behaviour still needs checking.
+the existing thermostat and fan source code; heat-pump behaviour still needs checking.
