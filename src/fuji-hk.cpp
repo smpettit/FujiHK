@@ -4,9 +4,13 @@
 
 
 #define NUM_LEDS 1
+#ifndef LED_PIN
 #define LED_PIN 27
+#endif
 #define LED_BRIGHTNESS 1
+#ifndef BTN_PIN
 #define BTN_PIN 39
+#endif
 
 #define RX_PIN 19
 #define TX_PIN 22
@@ -497,8 +501,10 @@ void setup() {
   
   homeSpan.setQRID("FUJI");
   homeSpan.setControlPin(BTN_PIN);
+#if LED_PIN >= 0
   homeSpan.setStatusPixel(LED_PIN,COLOR_CYAN_HSV);
   homeSpan.setStatusAutoOff(30);
+#endif
   homeSpan.setApSSID(acName);
   homeSpan.begin(Category::AirConditioners,"Fujitsu AirConditioner", "FUJIAC", "FUJIAC");
 
