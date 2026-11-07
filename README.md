@@ -2,6 +2,13 @@ Fujitsu AirConditioner Controller for HomeKit
 ----------
 Flash to an [M5Atom](https://shop.m5stack.com/collections/atom-series/products/atom-lite-esp32-development-kit), and add your Fujitsu AirConditioner (Heatpump) to your HomeKit home. Should work with most other ESP32 kits as well.
 
+Building from source
+--------------------
+
+This fork includes a default build for the Jaycar Duinotech XC3800 ESP32 board,
+alongside the original M5Atom build. See [the Linux build guide](docs/building.md)
+for installation, building, USB flashing, and serial configuration.
+
 Quick start
 -----------
 
