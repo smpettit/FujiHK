@@ -116,13 +116,14 @@ revision was `107ffc0`.
 
 | Environment | RAM used | Application flash used (limit 1,966,080 bytes) |
 | --- | --- | --- |
-| `esp32dev` | 62,036 bytes | 1,642,008 bytes (83.5%) |
-| `m5stack-atom` | 62,724 bytes | 1,658,801 bytes (84.4%) |
+| `esp32dev` | 62,060 bytes | 1,646,496 bytes (83.7%) |
+| `m5stack-atom` | 62,748 bytes | 1,663,193 bytes (84.6%) |
 
 The larger application slots are necessary for the upgraded firmware; the
 older default partition layout does not fit it.
 
 A successful build verifies compilation and image size. It does not verify
 physical wiring, Wi-Fi authentication, HomeKit operation, or communication with
-the heat pump. Recheck those on hardware after flashing. This change preserves
-the existing thermostat and fan source code; heat-pump behaviour still needs checking.
+the heat pump. Recheck those on hardware after flashing. See [the controls guide](homekit-controls.md)
+for the fan-service UI validation and pending tests on the actual heat pump.
+The existing Heater/Cooler temperature representation is retained.

@@ -13,6 +13,14 @@ For the XC3800 / MCP2021 build, see [the hardware guide](docs/hardware.md) for
 the parts list, wiring tables, circuit schematic, and breadboard layout.
 The original M5Atom instructions below describe the upstream hardware.
 
+Home controls
+-------------
+
+This fork adds Fan Speed and an Auto Fan switch alongside the Heater/Cooler
+controls. Fan 0%/Off shuts down the unit; Auto Fan changes fan mode without
+changing unit power. See [the controls guide](docs/homekit-controls.md) for the
+speed presets, tested Home app behaviour, and remaining hardware checks.
+
 Quick start
 -----------
 
