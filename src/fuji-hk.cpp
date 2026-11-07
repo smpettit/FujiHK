@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <HomeSpan.h>
 #include <FujiHeatPump.h>
+#include "fan-control.h"
 
 
 #define NUM_LEDS 1
@@ -71,6 +72,138 @@ enum class CurrentHeatingCoolerState {
 char sn[32];
 char acName[64];
 
+FanControl fanControl;
+bool awaitingFanEcho = false;
+bool awaitingPowerEcho = false;
+unsigned long fanRequestedAt = 0;
+unsigned long powerRequestedAt = 0;
+
+bool acceptBusValue(bool &awaiting, unsigned long requestedAt, bool matches) {
+    if (awaiting && !matches && millis() - requestedAt < 5000) {
+        return false;
+    }
+    awaiting = false;
+    return true;
+}
+
+void syncControlsFromBus() {
+    if (xSemaphoreTake(updateMutex, 0) != pdTRUE) {
+        return;
+    }
+    if (sharedState.isBound) {
+        // Each field waits for its own acknowledgement so an old bus frame
+        // cannot immediately undo a new power or fan request in the Home UI.
+        if (acceptBusValue(awaitingFanEcho, fanRequestedAt, sharedState.fanMode == fanControl.setting())) {
+            fanControl.observeFan(sharedState.fanMode);
+        }
+        bool on = sharedState.onOff == 1;
+        if (acceptBusValue(awaitingPowerEcho, powerRequestedAt, on == fanControl.powered())) {
+            fanControl.observePower(on);
+        }
+    }
+    xSemaphoreGive(updateMutex);
+}
+
+
+boolean queueFanWrite(const FanControl::Write &write, const char *source) {
+    FanControl next = fanControl;
+    FanControl::Command command;
+    if (!next.apply(write, command) || xSemaphoreTake(pendingMutex, (TickType_t)200) != pdTRUE) {
+        return false;
+    }
+
+    if (command.fanUpdated) {
+        pendingState.fanMode = command.fan;
+        pendingFields |= kFanModeUpdateMask;
+        awaitingFanEcho = true;
+        fanRequestedAt = millis();
+    }
+    if (command.powerUpdated) {
+        pendingState.onOff = command.power ? 1 : 0;
+        pendingFields |= kOnOffUpdateMask;
+        awaitingPowerEcho = true;
+        powerRequestedAt = millis();
+    }
+    xSemaphoreGive(pendingMutex);
+    fanControl = next;
+    Serial.printf("%s: activeWrite=%d targetWrite=%d speedWrite=%d -> setting=%u power=%d powerCommand=%d\n",
+              source, write.activeUpdated ? static_cast<int>(write.active) : -1,
+              write.targetUpdated ? write.target : -1,
+              write.speedUpdated ? static_cast<int>(write.speed) : -1,
+              static_cast<unsigned int>(fanControl.setting()),
+              static_cast<int>(fanControl.powered()), static_cast<int>(command.powerUpdated));
+    return true;
+}
+
+struct FujitsuFan : Service::Fan {
+    SpanCharacteristic *active;
+    SpanCharacteristic *target;
+    SpanCharacteristic *speed;
+
+    FujitsuFan() : Service::Fan() {
+        new Characteristic::ConfiguredName("Fan Speed");
+        syncControlsFromBus();
+        active = new Characteristic::Active(fanControl.powered());
+        target = new Characteristic::TargetFanState(fanControl.automatic() ? 1 : 0);
+        speed = new Characteristic::RotationSpeed(fanControl.displayedSpeed());
+        speed->setRange(0, 100, 25);
+    }
+
+    boolean update() override {
+        if (!active->updated() && !target->updated() && !speed->updated()) {
+            return true;
+        }
+        FanControl::Write write;
+        write.activeUpdated = active->updated();
+        write.active = active->getNewVal() != 0;
+        write.targetUpdated = target->updated();
+        write.target = target->getNewVal();
+        write.speedUpdated = speed->updated();
+        write.speed = speed->getNewVal<float>();
+        return queueFanWrite(write, "Fan Speed");
+    }
+
+    void loop() override {
+        // Publish after update() returns and HomeSpan commits the incoming
+        // values. Both services use this same state, including off-bus testing.
+        if (active->getVal() != fanControl.powered()) {
+            active->setVal(fanControl.powered());
+        }
+        int mode = fanControl.automatic() ? 1 : 0;
+        if (target->getVal() != mode) {
+            target->setVal(mode);
+        }
+        if (speed->getVal<float>() != fanControl.displayedSpeed()) {
+            speed->setVal(fanControl.displayedSpeed());
+        }
+    }
+};
+
+struct FujitsuFanAuto : Service::Switch {
+    SpanCharacteristic *automatic;
+
+    FujitsuFanAuto() : Service::Switch() {
+        new Characteristic::ConfiguredName("Auto Fan");
+        automatic = new Characteristic::On(fanControl.automatic());
+    }
+
+    boolean update() override {
+        if (!automatic->updated()) {
+            return true;
+        }
+        FanControl::Write write;
+        write.targetUpdated = true;
+        write.target = automatic->getNewVal() ? 1 : 0;
+        return queueFanWrite(write, "Auto Fan");
+    }
+
+    void loop() override {
+        if (automatic->getVal() != fanControl.automatic()) {
+            automatic->setVal(fanControl.automatic());
+        }
+    }
+};
+
 
 struct FujitsuHK : Service::HeaterCooler { 
 
@@ -81,12 +214,6 @@ struct FujitsuHK : Service::HeaterCooler {
     SpanCharacteristic *coolingThresholdTemperature;
     SpanCharacteristic *heatingThresholdTemperature;
     SpanCharacteristic *temperatureDisplayUnits;
-
-    SpanService *fan;
-    SpanCharacteristic *fanActive;
-    SpanCharacteristic *rotationSpeed;
-    SpanCharacteristic *currentFanState;
-    SpanCharacteristic *targetFanMode;
 
 
     FujitsuHK() : Service::HeaterCooler(){       // constructor() method
@@ -102,7 +229,8 @@ struct FujitsuHK : Service::HeaterCooler {
         Serial.print("Failed to get MUTEX lock, using defaults\n"); 
       }
 
-      active = new Characteristic::Active(currentState.isBound ? currentState.onOff == 1 : false);
+      syncControlsFromBus();
+      active = new Characteristic::Active(fanControl.powered());
       
       currentTemp = new Characteristic::CurrentTemperature(currentState.isBound ? currentState.controllerTemp : 22);
       currentTemp->setRange(0, 100, 1);
@@ -120,9 +248,6 @@ struct FujitsuHK : Service::HeaterCooler {
       
       temperatureDisplayUnits = new Characteristic::TemperatureDisplayUnits(0);
 
-      rotationSpeed = new Characteristic::RotationSpeed(currentState.isBound ? currentState.fanMode*25 : 0);
-      rotationSpeed->setRange(0,100,25);
-      
     } // end constructor
 
     int convertACModeToHKMode(byte acMode) {
@@ -159,6 +284,10 @@ struct FujitsuHK : Service::HeaterCooler {
 
 
     void loop(){
+      // The fan tile and heater/cooler tile represent the same unit power.
+      if (active->getVal() != fanControl.powered()) {
+        active->setVal(fanControl.powered());
+      }
       FujiStatus currentState;
 
       if(pendingFields) { // if there are pending updates skip the loop to avoid UI bounces
@@ -175,22 +304,6 @@ struct FujitsuHK : Service::HeaterCooler {
 
       if(!currentState.isBound) {
         return;
-      }
-
-      bool onOff = currentState.onOff == 1 ? true : false;
-
-      if(active->getVal() != onOff) {
-        Serial.printf("loop(): Remote updated active-> %d\n", onOff);
-        active->setVal(onOff);
-      }
-
-      byte fanMode = currentState.fanMode;
-      
-      if(fanMode >= 0 && fanMode <= 4) {
-        if(rotationSpeed->getVal()/25 != fanMode) {
-          Serial.printf("loop(): Remote updated fanSpeed -> %d\n", fanMode);
-          rotationSpeed->setVal(fanMode*25);
-        }
       }
 
       byte convertedMode = convertHKModeToACMode(targetHeaterCoolerState->getVal());
@@ -293,6 +406,9 @@ struct FujitsuHK : Service::HeaterCooler {
           if(xSemaphoreTake( pendingMutex, (TickType_t)200 ) == pdTRUE) {
             pendingFields |= kOnOffUpdateMask;
             pendingState.onOff = active->getNewVal() ? 1 : 0;
+            fanControl.observePower(active->getNewVal() != 0);
+            awaitingPowerEcho = true;
+            powerRequestedAt = millis();
             xSemaphoreGive( pendingMutex);
           }
 
@@ -316,36 +432,6 @@ struct FujitsuHK : Service::HeaterCooler {
                 break;
               case static_cast<int>(HeatingCoolerState::HeatCool):
                 pendingState.acMode = static_cast<byte>(FujiMode::AUTO);
-                break;
-            }
-            xSemaphoreGive(pendingMutex);
-          }
-        }
-      }
-
-      if(rotationSpeed->updated())
-      {
-        if(rotationSpeed->getVal() != rotationSpeed->getNewVal()) {
-          Serial.printf("update(): rotationSpeed %d -> %d\n", rotationSpeed->getVal(), rotationSpeed->getNewVal());
-          
-          if(xSemaphoreTake(pendingMutex, ( TickType_t ) 200 ) == pdTRUE) {
-            pendingFields |= kFanModeUpdateMask;
-            
-            switch(rotationSpeed->getNewVal()){
-              case 0:
-                pendingState.fanMode = static_cast<byte>(FujiFanMode::FAN_AUTO);
-                break;
-              case 25:
-                pendingState.fanMode = static_cast<byte>(FujiFanMode::FAN_QUIET);
-                break;
-              case 50:
-                pendingState.fanMode = static_cast<byte>(FujiFanMode::FAN_LOW);
-                break;
-              case 75:
-                pendingState.fanMode = static_cast<byte>(FujiFanMode::FAN_MEDIUM);
-                break;
-              case 100:
-                pendingState.fanMode = static_cast<byte>(FujiFanMode::FAN_HIGH);
                 break;
             }
             xSemaphoreGive(pendingMutex);
@@ -524,10 +610,13 @@ void setup() {
       new Characteristic::Version("1.1.0");
       
     new FujitsuHK();
+    new FujitsuFan();
+    new FujitsuFanAuto();
 
   Serial.print("Finished setup\n");
 }
 
 void loop() {
+  syncControlsFromBus();
   homeSpan.poll();
 }
