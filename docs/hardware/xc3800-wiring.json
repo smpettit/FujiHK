@@ -126,7 +126,11 @@
           "LIN_RX",
           "i47"
         ]
-      ]
+      ],
+      "placement": {
+        "first_hole": "b40",
+        "last_hole": "i58"
+      }
     },
     {
       "id": "R1",

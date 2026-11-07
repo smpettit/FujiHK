@@ -157,10 +157,20 @@ def breadboard(jumper_nets):
     svg.parts.append('<path d="M 350 470 Q 360 491 370 470" fill="none" stroke="#64748b" stroke-width="2"/>')
     svg.rect(40, 228, 96, 110)
     svg.text(85, 217, "U2", "small", "middle")
-    svg.rect(168, 875, 390, 650, "#eef2ff")
-    svg.text(363, 913, "A1 / XC3800", anchor="middle")
-    svg.text(363, 976, "antenna toward row 1", "small", "middle")
-    svg.text(363, 1487, "USB end", "small", "middle")
+    placement = COMPONENTS["A1"]["placement"]
+    first, last = placement["first_hole"], placement["last_hole"]
+    left, top = xy(first)
+    right, bottom = xy(last)
+    centre = (left + right) / 2
+    # Keep the outline inside adjacent columns and rows, leaving jumper holes exposed.
+    svg.rect(left - 14, top - 14, right - left + 28, bottom - top + 28, "#eef2ff")
+    for row in range(int(first[1:]), int(last[1:]) + 1):
+        for column in (first[0], last[0]):
+            svg.circle(*xy(f"{column}{row}"), 4, "#64748b")
+    svg.text(centre, top + 36, "A1 / XC3800", anchor="middle")
+    svg.text(centre, top + 88, "antenna toward row 1", "small", "middle")
+    svg.text(centre, top + 132, "b–i · rows 40–58", "small", "middle")
+    svg.text(centre, bottom - 15, "USB end", "small", "middle")
     for component_id in ("U1", "U2", "A1"):
         for pin, net, hole in COMPONENTS[component_id]["pins"]:
             x, y = xy(hole)
