@@ -13,10 +13,16 @@ Both builds use GPIO19 for LIN RX and GPIO22 for LIN TX. They retain the
 upstream secondary-controller mode, for use alongside an existing wired wall
 controller. The XC3800's EN button resets the board; BOOT is its setup button.
 
-The working baseline uses PlatformIO Espressif32 **6.13.0** (Arduino-ESP32
-**2.0.17**) and HomeSpan **release-1.9.1**. The platform and HomeSpan versions
-are pinned in `platformio.ini`. FujiHeatPump still follows the upstream Git
-repository's default branch, so its revision can change between fresh installs.
+The current build uses PlatformIO Espressif32 **8.0.0** (Arduino-ESP32
+**3.3.12**, ESP-IDF **5.5.5**) and HomeSpan **2.1.8**, with the framework's
+`min_spiffs.csv` partition layout. Both boards compile with these versions;
+hardware validation is pending. See [the upgrade findings](toolchain-upgrade.md)
+for the reproduced failures, partition changes, and checks before flashing.
+
+The owner's working hardware baseline used Espressif32 **6.13.0**, Arduino-ESP32
+**2.0.17**, and HomeSpan **release-1.9.1**. The current platform and HomeSpan
+versions are pinned in `platformio.ini`. FujiHeatPump still follows the upstream
+Git repository's default branch, so its revision can change between fresh installs.
 Sibling FujiHeatPump, HomeSpan, and platform-espressif32 checkouts are not used
 by these builds; PlatformIO downloads the dependencies in `platformio.ini`.
 
@@ -55,6 +61,9 @@ written at the correct offsets; `firmware.bin` alone is not a complete flash ima
 
 ## Flash over USB
 
+When upgrading from the older build, review [the partition migration notes](toolchain-upgrade.md#partition-layout-and-first-upgrade)
+first. This upgrade changes the partition table and requires USB flashing.
+
 For this externally powered XC3800 build, **never connect USB while the heat-pump
 12 V supply is connected**. Remove the ESP32 from the breadboard before connecting
 USB. After flashing, disconnect USB before reinstalling it in the circuit.
@@ -91,24 +100,24 @@ also a boot-strapping pin: holding BOOT during reset enters the ESP32 downloader
 
 The existing installation has been reported working with WPA2-Personal, but
 fails to connect to its Aruba Instant On WPA2/WPA3 mixed network. Mixed-mode
-and WPA3 operation remain unverified for this baseline. Toolchain upgrades and
-Wi-Fi interoperability are separate follow-up work.
+and WPA3 operation remain unverified for the upgraded firmware. A successful
+build does not establish that the Wi-Fi interoperability issue is fixed.
 
 ## Validation limits
 
 Both environments compiled successfully on Linux with PlatformIO Core 6.1.19
 and Python 3.14. The resolved FujiHeatPump revision was `72e00ec` and HomeSpan
-revision was `c6e032b`.
+revision was `107ffc0`.
 
-| Environment | RAM used | Application flash used (limit 1,310,720 bytes) |
+| Environment | RAM used | Application flash used (limit 1,966,080 bytes) |
 | --- | --- | --- |
-| `esp32dev` | 59,008 bytes | 1,234,637 bytes (94.2%) |
-| `m5stack-atom` | 59,136 bytes | 1,242,709 bytes (94.8%) |
+| `esp32dev` | 62,036 bytes | 1,642,008 bytes (83.5%) |
+| `m5stack-atom` | 62,724 bytes | 1,658,801 bytes (84.4%) |
 
-Application flash space is limited; a future dependency upgrade may require
-reviewing the partition layout before flashing.
+The larger application slots are necessary for the upgraded firmware; the
+older default partition layout does not fit it.
 
 A successful build verifies compilation and image size. It does not verify
 physical wiring, Wi-Fi authentication, HomeKit operation, or communication with
 the heat pump. Recheck those on hardware after flashing. This change preserves
-the existing thermostat and fan behaviour.
+the existing thermostat and fan source code; runtime behaviour still needs checking.
